@@ -91,9 +91,13 @@ struct MainView: View {
                     title: "Accessibility access",
                     detail: state.trusted
                         ? "Granted — the app can watch the trackpad and post the release."
-                        : "Turn it on in Privacy & Security → Accessibility. Not in the list? Add it with + from Applications.",
+                        : "Needed so the app can watch the trackpad and post the release.",
                     actionTitle: state.trusted ? "Open Settings" : "Grant",
                     action: state.requestAccessibility)
+
+            if !state.trusted {
+                accessGuide
+            }
 
             divider
 
@@ -102,7 +106,7 @@ struct MainView: View {
                     title: "Tap to drag",
                     detail: state.tapToDrag
                         ? "On — double-tap and hold to drag."
-                        : "Turn on “Use trackpad for dragging” in Trackpad Options.",
+                        : "In Trackpad → Trackpad Options…, set “Dragging style” to “Without Drag Lock”.",
                     actionTitle: "Open",
                     action: state.openTrackpadSettings)
 
@@ -118,6 +122,28 @@ struct MainView: View {
                     action: state.dragLock ? state.openTrackpadSettings : nil)
         }
         .background(card)
+    }
+
+    /// The permission dance in System Settings, spelled out: the exact panel
+    /// opens with the button above, these are the steps inside it, and the
+    /// step above ticks itself off the moment the grant lands (the 0.5 s poll
+    /// notices without a restart).
+    private var accessGuide: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            guideLine("Press + in the Accessibility list — or drag the app from Applications into it.")
+            guideLine("Pick “No Drag Release Delay” and switch its toggle on.")
+            guideLine("This window ticks itself off the moment it is granted.")
+        }
+        .padding(.leading, 40)
+        .padding(.trailing, 12)
+        .padding(.vertical, 6)
+    }
+
+    private func guideLine(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 10))
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     // MARK: - Options

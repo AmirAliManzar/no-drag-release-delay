@@ -103,7 +103,7 @@ final class AppState: ObservableObject {
 
     func openTrackpadSettings() {
         open([
-            "x-apple.systempreferences:com.apple.preference.universalaccess?Trackpad",
+            "x-apple.systempreferences:com.apple.Trackpad-Settings.extension",
             "x-apple.systempreferences:com.apple.Accessibility-Settings.extension",
         ])
     }
