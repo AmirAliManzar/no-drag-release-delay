@@ -102,9 +102,9 @@ builds are otherwise identical.
 The installers copy the app to `/Applications` and launch it, so the first-run window can
 walk you through the accessibility grant. `SHA256SUMS` is published alongside them.
 
-The build is signed ad-hoc, not notarised. On first launch macOS may say the app was
-downloaded from the internet; open *System Settings → Privacy & Security* and choose
-**Open Anyway**, or run:
+The build is signed with a stable self-signed certificate, not notarised. On first launch
+macOS may say the app was downloaded from the internet; open *System Settings → Privacy &
+Security* and choose **Open Anyway**, or run:
 
 ```sh
 xattr -dr com.apple.quarantine "/Applications/No Drag Release Delay.app"

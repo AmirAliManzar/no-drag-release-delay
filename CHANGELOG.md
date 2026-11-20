@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] — 2026-11-21
+
+### Fixed
+
+- The Accessibility grant survives rebuilds and updates. Builds now sign with a stable
+  self-signed identity (`NDRD Local`) instead of an ad-hoc signature, whose hash changed
+  on every build and silently invalidated the TCC grant while the System Settings toggle
+  still looked switched on.
+- Preference changes made in the Setup window reach the status item and the menu in the
+  same frame; the mark and the menu no longer wait for the next poll.
+
 ## [1.1.0] — 2026-11-20
 
 ### Added
@@ -48,5 +59,6 @@ All notable changes to this project are documented here. The format follows
 - Requires macOS 13 or later and Accessibility permission.
 - Inactive while drag lock is enabled, by design.
 
-[1.1.0]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.1.0
+[1.1.1]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.1.1
+[1.1.0]: https://github.com/amiralimanzar/no-drag-release-delay/releases/tag/v1.1.0
 [1.0.0]: https://github.com/amiralimanzar/no-drag-release-delay/releases/tag/v1.0.0
