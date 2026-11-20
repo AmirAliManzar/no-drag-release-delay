@@ -9,7 +9,7 @@ final class AppState: ObservableObject {
 
     @Published private(set) var trusted = AXIsProcessTrusted()
     @Published private(set) var isEnabled = Preferences.shared.isEnabled
-    @Published private(set) var showInMenuBar = Preferences.shared.showInMenuBar
+    @Published private(set) var menuBarMode = Preferences.shared.menuBarMode
     @Published private(set) var showInDock = Preferences.shared.showInDock
     @Published private(set) var tapToDrag = TrackpadSettings.draggingEnabled
     @Published private(set) var dragLock = TrackpadSettings.dragLockEnabled
@@ -27,7 +27,7 @@ final class AppState: ObservableObject {
     func refresh() {
         assign(\.trusted, AXIsProcessTrusted())
         assign(\.isEnabled, Preferences.shared.isEnabled)
-        assign(\.showInMenuBar, Preferences.shared.showInMenuBar)
+        assign(\.menuBarMode, Preferences.shared.menuBarMode)
         assign(\.showInDock, Preferences.shared.showInDock)
         assign(\.tapToDrag, TrackpadSettings.draggingEnabled)
         assign(\.dragLock, TrackpadSettings.dragLockEnabled)
@@ -49,20 +49,20 @@ final class AppState: ObservableObject {
         refresh()
     }
 
-    /// The app must stay reachable through at least one surface, so turning the
-    /// last visible one off turns the other one on instead of hiding the app.
-    func setShowInMenuBar(_ value: Bool) {
-        if !value && !showInDock {
+    /// Mirrors the old boolean rule: hiding the menu bar entirely keeps the
+    /// Dock on, so the app stays reachable through one surface.
+    func setMenuBarMode(_ value: MenuBarMode) {
+        if value == .never && !showInDock {
             Preferences.shared.showInDock = true
         }
-        Preferences.shared.showInMenuBar = value
+        Preferences.shared.menuBarMode = value
         refresh()
         onPresentationChange?()
     }
 
     func setShowInDock(_ value: Bool) {
-        if !value && !showInMenuBar {
-            Preferences.shared.showInMenuBar = true
+        if !value && menuBarMode == .never {
+            Preferences.shared.menuBarMode = .always
         }
         Preferences.shared.showInDock = value
         refresh()

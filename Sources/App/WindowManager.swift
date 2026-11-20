@@ -7,6 +7,12 @@ final class WindowManager {
     private var mainWindow: NSWindow?
     private var aboutWindow: NSWindow?
 
+    /// True while any app window is on screen — the menu bar's `windowOpen`
+    /// mode keys off this so the icon stays within reach while it matters.
+    var hasVisibleWindow: Bool {
+        (mainWindow?.isVisible ?? false) || (aboutWindow?.isVisible ?? false)
+    }
+
     func showMain() {
         if mainWindow == nil {
             let root = MainView(state: .shared) { [weak self] in

@@ -126,13 +126,32 @@ struct MainView: View {
         VStack(spacing: 0) {
             toggle("Enabled", isOn: state.isEnabled, set: state.setEnabled)
             divider
-            toggle("Show in menu bar", isOn: state.showInMenuBar, set: state.setShowInMenuBar)
+            modeRow
             divider
             toggle("Show in Dock", isOn: state.showInDock, set: state.setShowInDock)
             divider
             toggle("Launch at login", isOn: state.launchAtLogin, set: state.setLaunchAtLogin)
         }
         .background(card)
+    }
+
+    private var modeRow: some View {
+        HStack {
+            Text("Menu bar").font(.system(size: 12))
+            Spacer(minLength: 12)
+            Picker(selection: Binding(get: { state.menuBarMode }, set: state.setMenuBarMode)) {
+                Text("Always").tag(MenuBarMode.always)
+                Text("Window open").tag(MenuBarMode.windowOpen)
+                Text("Never").tag(MenuBarMode.never)
+            } label: {
+                EmptyView()
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(width: 210)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 5)
     }
 
     // MARK: - Footer

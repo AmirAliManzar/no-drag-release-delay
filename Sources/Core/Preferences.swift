@@ -1,17 +1,27 @@
 import Foundation
 
+/// How the app presents itself in the system menu bar.
+enum MenuBarMode: String {
+    /// The icon is always visible.
+    case always
+    /// The icon is visible only while a Setup or About window is on screen.
+    case windowOpen
+    /// The icon is never visible.
+    case never
+}
+
 /// User-facing settings, backed by `UserDefaults`.
 ///
-/// Presentation (menu bar / Dock) is deliberately *not* stored here as a single
-/// enum: the two surfaces are independent, and the only invariant is that the
-/// app must remain reachable through at least one of them.
+/// Presentation is split across two surfaces: a three-way `menuBarMode` and a
+/// `showInDock` boolean. The two are independent, and the only invariant is
+/// that the app must remain reachable through at least one of them.
 final class Preferences {
     static let shared = Preferences()
     static let didChange = Notification.Name("Preferences.didChange")
 
     private enum Key {
         static let enabled = "enabled"
-        static let showInMenuBar = "showInMenuBar"
+        static let menuBarMode = "menuBarMode"
         static let showInDock = "showInDock"
         static let completedOnboarding = "completedOnboarding"
     }
@@ -21,7 +31,7 @@ final class Preferences {
     private init() {
         store.register(defaults: [
             Key.enabled: true,
-            Key.showInMenuBar: true,
+            Key.menuBarMode: MenuBarMode.always.rawValue,
             Key.showInDock: false,
             Key.completedOnboarding: false,
         ])
@@ -32,9 +42,9 @@ final class Preferences {
         set { store.set(newValue, forKey: Key.enabled); notifyChange() }
     }
 
-    var showInMenuBar: Bool {
-        get { store.bool(forKey: Key.showInMenuBar) }
-        set { store.set(newValue, forKey: Key.showInMenuBar); notifyChange() }
+    var menuBarMode: MenuBarMode {
+        get { MenuBarMode(rawValue: store.string(forKey: Key.menuBarMode) ?? "") ?? .always }
+        set { store.set(newValue.rawValue, forKey: Key.menuBarMode); notifyChange() }
     }
 
     var showInDock: Bool {

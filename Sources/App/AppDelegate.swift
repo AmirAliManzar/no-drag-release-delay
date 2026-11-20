@@ -53,7 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NSApp.setActivationPolicy(useDock ? .regular : .accessory)
         NSApp.mainMenu = useDock ? MainMenu.build() : nil
-        statusItem?.isVisible = Preferences.shared.showInMenuBar
+        syncMenuBarVisibility()
 
         updateStatusIcon()
         refreshMenu()
@@ -61,6 +61,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if useDock {
             NSApp.activate(ignoringOtherApps: true)
         }
+    }
+
+    /// The status item follows `menuBarMode`; `windowOpen` additionally needs
+    /// to know whether a window is on screen, which the 0.5 s poll keeps fresh.
+    private func syncMenuBarVisibility() {
+        let mode = Preferences.shared.menuBarMode
+        statusItem?.isVisible = mode == .always
+            || (mode == .windowOpen && WindowManager.shared.hasVisibleWindow)
     }
 
     private func buildStatusItem() {
@@ -95,7 +103,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         enabledItem = add(to: menu, "Enabled", #selector(toggleEnabled))
         menu.addItem(.separator())
-        menuBarItem = add(to: menu, "Show in Menu Bar", #selector(toggleMenuBar))
+        menuBarItem = add(to: menu, "Menu Bar", nil)
+        menuBarItem?.submenu = buildMenuBarModeSubmenu()
         dockItem = add(to: menu, "Show in Dock", #selector(toggleDock))
         loginItem = add(to: menu, "Launch at Login", #selector(toggleLogin))
         menu.addItem(.separator())
@@ -110,16 +119,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @discardableResult
-    private func add(to menu: NSMenu, _ title: String, _ action: Selector, key: String = "") -> NSMenuItem {
+    private func add(to menu: NSMenu, _ title: String, _ action: Selector?, key: String = "") -> NSMenuItem {
         let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
         item.target = self
         menu.addItem(item)
         return item
     }
 
+    private func buildMenuBarModeSubmenu() -> NSMenu {
+        let submenu = NSMenu()
+        submenu.autoenablesItems = false
+        let modes: [(MenuBarMode, String)] = [
+            (.always, "Always"),
+            (.windowOpen, "While a Window is Open"),
+            (.never, "Never"),
+        ]
+        for (mode, title) in modes {
+            let item = NSMenuItem(title: title,
+                                  action: #selector(setMenuBarModeFromMenu(_:)),
+                                  keyEquivalent: "")
+            item.target = self
+            item.representedObject = mode.rawValue
+            submenu.addItem(item)
+        }
+        return submenu
+    }
+
     private func refreshMenu() {
         enabledItem?.state = Preferences.shared.isEnabled ? .on : .off
-        menuBarItem?.state = Preferences.shared.showInMenuBar ? .on : .off
+        for item in menuBarItem?.submenu?.items ?? [] {
+            item.state = (item.representedObject as? String) == Preferences.shared.menuBarMode.rawValue ? .on : .off
+        }
         dockItem?.state = Preferences.shared.showInDock ? .on : .off
         loginItem?.state = AppState.shared.launchAtLogin ? .on : .off
         permissionItem?.isHidden = trusted
@@ -134,8 +164,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         refreshMenu()
     }
 
-    @objc private func toggleMenuBar() {
-        AppState.shared.setShowInMenuBar(!Preferences.shared.showInMenuBar)
+    @objc private func setMenuBarModeFromMenu(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String,
+              let mode = MenuBarMode(rawValue: raw) else { return }
+        AppState.shared.setMenuBarMode(mode)
     }
 
     @objc private func toggleDock() {
@@ -174,6 +206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // costing anything; TCC is a cheap syscall.
         pollTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             self?.refreshTrust()
+            self?.syncMenuBarVisibility()
         }
 
         // The switch lives in System Settings, so the interesting transitions
