@@ -119,7 +119,7 @@ private struct BrandRow: View {
                     .frame(width: 13, height: 13)
                     .foregroundStyle(Color(hex: link.tint))
             } else {
-                Image(systemName: "link")
+                Image(systemName: link.symbol ?? "link")
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Color(hex: link.tint))
             }

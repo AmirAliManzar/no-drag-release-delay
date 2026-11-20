@@ -5,7 +5,7 @@ enum Author {
 
     /// The canonical repository. Used by the About panel and by the updater-free
     /// "source" link, so it must stay in sync with the README.
-    static let repository = URL(string: "https://github.com/amiralimanzar/no-drag-release-delay")!
+    static let repository = URL(string: "https://github.com/AmirAliManzar/no-drag-release-delay")!
 
     struct Link: Identifiable {
         /// Matches a vector file in `Resources/BrandIcons/<id>.svg`.
@@ -14,13 +14,30 @@ enum Author {
         let handle: String
         let url: URL
         let tint: String
+        /// SF Symbol fallback for links that have no bundled brand mark.
+        let symbol: String?
+
+        init(id: String, title: String, handle: String, url: URL, tint: String, symbol: String? = nil) {
+            self.id = id
+            self.title = title
+            self.handle = handle
+            self.url = url
+            self.tint = tint
+            self.symbol = symbol
+        }
     }
 
     static let links: [Link] = [
+        Link(id: "email",
+             title: "Email",
+             handle: "contact@amiralimanzar.ir",
+             url: URL(string: "mailto:contact@amiralimanzar.ir")!,
+             tint: "#1E88E5",
+             symbol: "envelope.fill"),
         Link(id: "github",
              title: "GitHub",
              handle: "amiralimanzar",
-             url: URL(string: "https://github.com/amiralimanzar")!,
+             url: URL(string: "https://github.com/AmirAliManzar")!,
              tint: "#24292F"),
         Link(id: "telegram",
              title: "Telegram",
