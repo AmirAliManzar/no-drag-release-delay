@@ -133,7 +133,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         button.image = StatusIcon.mark()
-        button.appearsDisabled = !trusted || !Preferences.shared.isEnabled
+        // The mark only dims for a paused engine — permission trouble is the
+        // Setup window's story, told in its tooltip.
+        button.appearsDisabled = !Preferences.shared.isEnabled
         button.toolTip = tooltip
     }
 
