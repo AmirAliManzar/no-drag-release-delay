@@ -32,13 +32,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.async { WindowManager.shared.showMain() }
         }
 
-        if !trusted {
-            // The permission flow comes up on its own — modal first, the exact
-            // pane right behind it — instead of waiting for a Grant click.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                AppState.shared.requestAccessibility()
-            }
-        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
