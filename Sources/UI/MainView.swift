@@ -14,6 +14,7 @@ struct MainView: View {
             section("Setup") { setup }
             section("Options") { options }
             DragTestCard()
+            section("About") { aboutLinks }
             footer
         }
         .padding(.horizontal, 24)
@@ -186,6 +187,26 @@ struct MainView: View {
 
     // MARK: - Footer
 
+    /// The developer summary and its links live in the window itself, so
+    /// reaching About never depends on finding the status item.
+    private var aboutLinks: some View {
+        HStack(spacing: 12) {
+            Text("Amir Ali Manzar")
+                .font(.system(size: 10, weight: .medium))
+            ForEach(Author.links) { link in
+                BrandLinkButton(link: link)
+            }
+            Spacer(minLength: 8)
+            Button("More…") { onAbout() }
+                .buttonStyle(.borderless)
+                .font(.system(size: 10))
+                .foregroundStyle(.secondary)
+                .contentShape(Rectangle())
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+    }
+
     private var footer: some View {
         HStack(spacing: 6) {
             Text("\(state.releases) released")
@@ -194,11 +215,8 @@ struct MainView: View {
                 Text("\(state.swallowed) duplicate clicks prevented")
             }
             Spacer()
-            Button("About") { onAbout() }
-                .buttonStyle(.link)
-                .font(.system(size: 10))
             Button("Log") { state.openLog() }
-                .buttonStyle(.link)
+                .buttonStyle(.borderless)
                 .font(.system(size: 10))
             Button("Done", action: onDone)
                 .keyboardShortcut(.defaultAction)
@@ -312,6 +330,41 @@ private struct StepRow: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+    }
+}
+
+/// A compact tap-through mark for one of the author's links; brand marks come
+/// from the bundled vectors, the email falls back to its SF Symbol.
+private struct BrandLinkButton: View {
+    let link: Author.Link
+
+    var body: some View {
+        Button {
+            NSWorkspace.shared.open(link.url)
+        } label: {
+            mark
+                .frame(width: 15, height: 15)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .help("\(link.title) — \(link.handle)")
+    }
+
+    @ViewBuilder private var mark: some View {
+        if link.id == "email", let symbol = link.symbol {
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.secondary)
+        } else if let image = Bundle.main.brandIcon(link.id) {
+            Image(nsImage: image)
+                .resizable()
+                .interpolation(.high)
+                .scaledToFit()
+        } else {
+            Image(systemName: link.symbol ?? "link")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary)
+        }
     }
 }
 
