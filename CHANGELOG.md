@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] — 2026-11-21
+
+### Changed
+
+- The app opens quietly: no permission modal or System Settings until the user clicks
+  *Grant* in Setup — reverting the auto-open introduced in 1.2.0.
+- The Dock icon is enabled by default alongside the menu bar mark.
+- More breathing room between the footer and the window's bottom edge.
+
 ## [1.2.0] — 2026-11-21
 
 ### Added
@@ -77,6 +86,7 @@ All notable changes to this project are documented here. The format follows
 - Requires macOS 13 or later and Accessibility permission.
 - Inactive while drag lock is enabled, by design.
 
+[1.2.1]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.2.1
 [1.2.0]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.2.0
 [1.1.1]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.1.1
 [1.1.0]: https://github.com/amiralimanzar/no-drag-release-delay/releases/tag/v1.1.0

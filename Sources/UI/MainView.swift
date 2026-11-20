@@ -19,7 +19,7 @@ struct MainView: View {
         }
         .padding(.horizontal, 24)
         .padding(.top, 32)
-        .padding(.bottom, 14)
+        .padding(.bottom, 20)
         .frame(width: 540)
         .fixedSize(horizontal: false, vertical: true)
         .background(Color(nsColor: .windowBackgroundColor))

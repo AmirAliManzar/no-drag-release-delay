@@ -32,7 +32,7 @@ final class Preferences {
         store.register(defaults: [
             Key.enabled: true,
             Key.menuBarMode: MenuBarMode.always.rawValue,
-            Key.showInDock: false,
+            Key.showInDock: true,
             Key.completedOnboarding: false,
         ])
     }
