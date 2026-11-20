@@ -88,12 +88,16 @@ Download the artifact for your Mac from the [releases page][releases]:
 
 | Artifact | Machine |
 | --- | --- |
-| `NoDragReleaseDelay-<version>-arm64.pkg` | Apple Silicon (M1 and later) |
-| `NoDragReleaseDelay-<version>-x86_64.pkg` | Intel |
+| `NoDragReleaseDelay-<version>-arm64.pkg` | Apple Silicon (M1 and later) — smoothest install |
+| `NoDragReleaseDelay-<version>-x86_64.pkg` | Intel — smoothest install |
 | `NoDragReleaseDelay-<version>-arm64.dmg` | Apple Silicon, drag to *Applications* |
 | `NoDragReleaseDelay-<version>-x86_64.dmg` | Intel, drag to *Applications* |
 | `NoDragReleaseDelay-<version>-arm64.app.zip` | Apple Silicon, unzipped app |
 | `NoDragReleaseDelay-<version>-x86_64.app.zip` | Intel, unzipped app |
+
+Prefer the `.pkg`: the installer launches the app itself, and files it installs carry no
+quarantine flag, so there is no *Open Anyway* step. A `.dmg` or `.app.zip` downloaded with
+a browser keeps macOS's quarantine mark, and its first launch needs **Open Anyway** once.
 
 The artifacts are per-architecture on purpose: a universal binary carries an Intel slice
 that macOS flags with an *App Update Required* warning on Apple Silicon, and the two

@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-11-21
+
+### Added
+
+- The permission flow opens on its own: at launch the system modal appears without a
+  Grant click, and the exact Accessibility pane slides in right behind it.
+- Developer links and the contact email live in the Setup window's About section, with a
+  *More…* control that opens the full About panel.
+
+### Changed
+
+- Toggling the Dock off keeps an open window in front of the frontmost app, instead of
+  reading like the app just quit.
+- The window tracks its SwiftUI content, so rows that appear later (the permission guide)
+  can no longer push the footer's controls out of reach.
+- The `.pkg` is the recommended download: files installed by the installer carry no
+  quarantine prompt, unlike a browser-downloaded `.dmg` or `.app.zip`.
+
 ## [1.1.1] — 2026-11-21
 
 ### Fixed
@@ -59,6 +77,7 @@ All notable changes to this project are documented here. The format follows
 - Requires macOS 13 or later and Accessibility permission.
 - Inactive while drag lock is enabled, by design.
 
+[1.2.0]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.2.0
 [1.1.1]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.1.1
 [1.1.0]: https://github.com/amiralimanzar/no-drag-release-delay/releases/tag/v1.1.0
 [1.0.0]: https://github.com/amiralimanzar/no-drag-release-delay/releases/tag/v1.0.0
