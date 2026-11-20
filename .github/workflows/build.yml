@@ -1,0 +1,18 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile universal
+        run: ./scripts/build.sh universal
+      - name: Verify slices
+        run: |
+          lipo -archs "build/universal/No Drag Release Delay.app/Contents/MacOS/NoDragReleaseDelay"
+          codesign --verify --strict "build/universal/No Drag Release Delay.app"

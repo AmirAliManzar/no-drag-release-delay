@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Runs after the package payload has been installed. Launch the app in the
+# console user's session so the onboarding window can explain the one permission
+# it needs; a package script runs as root and has no GUI session of its own.
+#
+set -euo pipefail
+
+APP="/Applications/No Drag Release Delay.app"
+CONSOLE_USER="$(stat -f '%Su' /dev/console)"
+
+if [ -d "$APP" ] && [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "root" ]; then
+    launchctl asuser "$(id -u "$CONSOLE_USER")" open "$APP" || true
+fi
+
+exit 0

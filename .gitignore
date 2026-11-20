@@ -1,0 +1,16 @@
+# Build output
+build/
+dist/
+
+# Xcode / editor state
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+DerivedData/
+
+# macOS
+.DS_Store
+._*
+
+# Generated icon (rebuilt by scripts/build.sh from tools/makeicon.swift)
+Resources/AppIcon.iconset/
