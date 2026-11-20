@@ -178,21 +178,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Permissions
 
     private func startPolling() {
-        pollTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self else { return }
-
-            let now = AXIsProcessTrusted()
-            if now != self.trusted {
-                self.trusted = now
-                Log.shared.info("accessibility = \(now)")
-                if now {
-                    Engine.shared.createTapIfPossible()
-                }
-                self.updateStatusIcon()
-                self.refreshMenu()
-            }
-
-            AppState.shared.refresh()
+        // Half a second keeps the setup window honest without measurably
+        // costing anything; TCC is a cheap syscall.
+        pollTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            self?.refreshTrust()
         }
+
+        // The switch lives in System Settings, so the interesting transitions
+        // happen while this app is in the background. Re-checking on every
+        // application switch makes the UI flip the moment the user returns.
+        NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification,
+                                               object: nil,
+                                               queue: .main) { [weak self] _ in
+            self?.refreshTrust()
+        }
+        NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didActivateApplicationNotification,
+                                                          object: nil,
+                                                          queue: .main) { [weak self] _ in
+            self?.refreshTrust()
+        }
+    }
+
+    private func refreshTrust() {
+        let now = AXIsProcessTrusted()
+        if now != trusted {
+            trusted = now
+            Log.shared.info("accessibility = \(now)")
+            if now {
+                Engine.shared.createTapIfPossible()
+            }
+            updateStatusIcon()
+            refreshMenu()
+        }
+
+        AppState.shared.refresh()
     }
 }

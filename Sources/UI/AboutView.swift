@@ -77,9 +77,7 @@ private struct BrandRow: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
                         .fill(Color(hex: link.tint).opacity(0.15))
-                    Image(systemName: link.symbol)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(Color(hex: link.tint))
+                    brandImage
                 }
                 .frame(width: 24, height: 24)
 
@@ -107,6 +105,38 @@ private struct BrandRow: View {
         }
         .buttonStyle(.plain)
         .onHover { hover.isHovering = $0 }
+    }
+
+    /// The brand's own mark, bundled as a vector and rendered as a template so
+    /// it follows the accent colour and both appearances.
+    private var brandImage: some View {
+        Group {
+            if let image = Bundle.main.brandIcon(link.id) {
+                Image(nsImage: image)
+                    .resizable()
+                    .interpolation(.high)
+                    .scaledToFit()
+                    .frame(width: 13, height: 13)
+                    .foregroundStyle(Color(hex: link.tint))
+            } else {
+                Image(systemName: "link")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Color(hex: link.tint))
+            }
+        }
+    }
+}
+
+extension Bundle {
+    /// Loads `Resources/BrandIcons/<id>.svg`. AppKit has shipped an SVG decoder
+    /// since Big Sur; the mark is marked as a template so callers can tint it.
+    func brandIcon(_ id: String) -> NSImage? {
+        guard let url = url(forResource: id, withExtension: "svg", subdirectory: "BrandIcons"),
+              let image = NSImage(contentsOf: url) else {
+            return nil
+        }
+        image.isTemplate = true
+        return image
     }
 }
 

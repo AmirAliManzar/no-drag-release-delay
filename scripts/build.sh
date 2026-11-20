@@ -77,6 +77,13 @@ fi
 cp "$ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 
 # Stray extended attributes turn into AppleDouble entries inside a .pkg payload.
+echo "==> Brand icons"
+mkdir -p "$APP/Contents/Resources/BrandIcons"
+for icon in "$ROOT"/Resources/BrandIcons/*.svg; do
+    cp "$icon" "$APP/Contents/Resources/BrandIcons/$(basename "$icon")"
+done
+
+# Stray extended attributes turn into AppleDouble entries inside a .pkg payload.
 xattr -cr "$APP"
 
 echo "==> Signing"

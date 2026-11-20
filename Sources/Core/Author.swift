@@ -8,11 +8,11 @@ enum Author {
     static let repository = URL(string: "https://github.com/amiralimanzar/no-drag-release-delay")!
 
     struct Link: Identifiable {
+        /// Matches a vector file in `Resources/BrandIcons/<id>.svg`.
         let id: String
         let title: String
         let handle: String
         let url: URL
-        let symbol: String
         let tint: String
     }
 
@@ -21,25 +21,26 @@ enum Author {
              title: "GitHub",
              handle: "amiralimanzar",
              url: URL(string: "https://github.com/amiralimanzar")!,
-             symbol: "chevron.left.forwardslash.chevron.right",
              tint: "#24292F"),
         Link(id: "telegram",
              title: "Telegram",
-             handle: "amiralimanzar",
-             url: URL(string: "https://t.me/amiralimanzar")!,
-             symbol: "paperplane.fill",
+             handle: "amiralimanzar1",
+             url: URL(string: "https://t.me/amiralimanzar1")!,
              tint: "#229ED9"),
+        Link(id: "instagram",
+             title: "Instagram",
+             handle: "amiralimanzar.ir",
+             url: URL(string: "https://instagram.com/amiralimanzar.ir")!,
+             tint: "#E4405F"),
         Link(id: "bale",
              title: "Bale",
-             handle: "amiralimanzar3",
-             url: URL(string: "https://ble.ir/amiralimanzar3")!,
-             symbol: "bubble.left.fill",
-             tint: "#00A693"),
+             handle: "amiralimanzar1",
+             url: URL(string: "https://ble.ir/amiralimanzar1")!,
+             tint: "#00B894"),
         Link(id: "linkedin",
              title: "LinkedIn",
-             handle: "amiralimanzar",
-             url: URL(string: "https://www.linkedin.com/in/amiralimanzar")!,
-             symbol: "briefcase.fill",
+             handle: "amirali-manzar",
+             url: URL(string: "https://www.linkedin.com/in/amirali-manzar")!,
              tint: "#0A66C2"),
     ]
 }

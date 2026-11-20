@@ -90,8 +90,8 @@ struct MainView: View {
                     index: 1,
                     title: "Accessibility access",
                     detail: state.trusted
-                        ? "Granted — the app can post the release event."
-                        : "Required to watch the trackpad and post the release.",
+                        ? "Granted — the app can watch the trackpad and post the release."
+                        : "Turn it on in Privacy & Security → Accessibility. Not in the list? Add it with + from Applications.",
                     actionTitle: state.trusted ? "Open Settings" : "Grant",
                     action: state.requestAccessibility)
 

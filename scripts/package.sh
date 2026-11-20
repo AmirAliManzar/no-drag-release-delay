@@ -4,8 +4,13 @@
 #
 #   dist/NoDragReleaseDelay-<version>-arm64.pkg      Apple Silicon installer
 #   dist/NoDragReleaseDelay-<version>-x86_64.pkg     Intel installer
-#   dist/NoDragReleaseDelay-<version>-universal.dmg  drag-to-Applications
+#   dist/NoDragReleaseDelay-<version>-arm64.dmg      Apple Silicon, drag to Applications
+#   dist/NoDragReleaseDelay-<version>-x86_64.dmg     Intel, drag to Applications
 #   dist/SHA256SUMS
+#
+# Artifacts are per-architecture on purpose: a universal binary carries an
+# Intel slice that macOS warns about on Apple Silicon, and the two builds are
+# otherwise identical.
 #
 # Set CODESIGN_IDENTITY to sign with a Developer ID instead of ad-hoc.
 set -euo pipefail
@@ -22,10 +27,11 @@ mkdir -p "$DIST"
 for arch in arm64 x86_64; do
     echo "==> $arch"
     "$ROOT/scripts/build.sh" "$arch" >/dev/null
+    APP="$ROOT/build/$arch/$NAME.app"
 
     STAGE="$(mktemp -d)"
     mkdir -p "$STAGE/Applications"
-    ditto "$ROOT/build/$arch/$NAME.app" "$STAGE/Applications/$NAME.app"
+    ditto "$APP" "$STAGE/Applications/$NAME.app"
 
     pkgbuild \
         --root "$STAGE" \
@@ -36,22 +42,19 @@ for arch in arm64 x86_64; do
         "$DIST/NoDragReleaseDelay-$VERSION-$arch.pkg"
 
     rm -rf "$STAGE"
+
+    STAGE="$ROOT/build/dmg-$arch"
+    rm -rf "$STAGE"
+    mkdir -p "$STAGE"
+    ditto "$APP" "$STAGE/$NAME.app"
+    ln -s /Applications "$STAGE/Applications"
+
+    hdiutil create \
+        -volname "$NAME" \
+        -srcfolder "$STAGE" \
+        -ov -format UDZO \
+        "$DIST/NoDragReleaseDelay-$VERSION-$arch.dmg" >/dev/null
 done
-
-echo "==> universal"
-"$ROOT/scripts/build.sh" universal >/dev/null
-
-STAGE="$ROOT/build/dmg"
-rm -rf "$STAGE"
-mkdir -p "$STAGE"
-ditto "$ROOT/build/universal/$NAME.app" "$STAGE/$NAME.app"
-ln -s /Applications "$STAGE/Applications"
-
-hdiutil create \
-    -volname "$NAME" \
-    -srcfolder "$STAGE" \
-    -ov -format UDZO \
-    "$DIST/NoDragReleaseDelay-$VERSION-universal.dmg" >/dev/null
 
 echo "==> checksums"
 (cd "$DIST" && shasum -a 256 *.pkg *.dmg > SHA256SUMS)
