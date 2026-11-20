@@ -240,6 +240,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                queue: .main) { [weak self] _ in
             self?.refreshTrust()
         }
+
+        // Preference changes made in the Setup window must reach the status
+        // item and this menu in the same frame — not on the next poll.
+        NotificationCenter.default.addObserver(forName: Preferences.didChange,
+                                               object: nil,
+                                               queue: .main) { [weak self] _ in
+            self?.updateStatusIcon()
+            self?.refreshMenu()
+            self?.syncMenuBarVisibility()
+        }
         NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didActivateApplicationNotification,
                                                           object: nil,
                                                           queue: .main) { [weak self] _ in
