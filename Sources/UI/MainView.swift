@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainView: View {
     @ObservedObject var state: AppState
+    var onAbout: () -> Void = {}
     var onDone: () -> Void
 
     var body: some View {
@@ -165,6 +166,8 @@ struct MainView: View {
         HStack {
             Text("Menu bar").font(.system(size: 12))
             Spacer(minLength: 12)
+            // Natural size: a fixed frame smaller than the three segments
+            // makes the control overflow the card padding.
             Picker(selection: Binding(get: { state.menuBarMode }, set: state.setMenuBarMode)) {
                 Text("Always").tag(MenuBarMode.always)
                 Text("Window open").tag(MenuBarMode.windowOpen)
@@ -173,8 +176,8 @@ struct MainView: View {
                 EmptyView()
             }
             .pickerStyle(.segmented)
+            .controlSize(.small)
             .labelsHidden()
-            .frame(width: 210)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
@@ -191,6 +194,9 @@ struct MainView: View {
                 Text("\(state.swallowed) duplicate clicks prevented")
             }
             Spacer()
+            Button("About") { onAbout() }
+                .buttonStyle(.link)
+                .font(.system(size: 10))
             Button("Log") { state.openLog() }
                 .buttonStyle(.link)
                 .font(.system(size: 10))
@@ -228,7 +234,7 @@ struct MainView: View {
     }
 
     private var divider: some View {
-        Divider().padding(.leading, 42)
+        Divider().padding(.leading, 12)
     }
 
     private var card: some View {
