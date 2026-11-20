@@ -1,5 +1,6 @@
 import Cocoa
 import ApplicationServices
+import Combine
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
@@ -8,7 +9,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuBarItem: NSMenuItem?
     private var dockItem: NSMenuItem?
     private var loginItem: NSMenuItem?
+    private var updateItem: NSMenuItem?
     private var permissionItem: NSMenuItem?
+    private var phaseObservation: AnyCancellable?
 
     private var pollTimer: Timer?
     private var trusted = AXIsProcessTrusted()
@@ -20,6 +23,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         AppState.shared.onPresentationChange = { [weak self] in self?.applyPresentation() }
         Engine.shared.onChange = { AppState.shared.refresh() }
+
+        // The update phase drives its menu item's title; keep the menu honest
+        // while a check, download or install runs.
+        phaseObservation = Updater.shared.$phase
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.refreshMenu() }
 
         buildStatusMenu()
         applyPresentation()
@@ -106,6 +115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menuBarItem?.submenu = buildMenuBarModeSubmenu()
         dockItem = add(to: menu, "Show in Dock", #selector(toggleDock))
         loginItem = add(to: menu, "Launch at Login", #selector(toggleLogin))
+        updateItem = add(to: menu, "Check for Updates…", #selector(checkForUpdates))
         menu.addItem(.separator())
         permissionItem = add(to: menu, "Grant Accessibility Access…", #selector(requestPermission))
         add(to: menu, "Setup & Test…", #selector(showMain))
@@ -172,7 +182,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         dockItem?.state = Preferences.shared.showInDock ? .on : .off
         loginItem?.state = AppState.shared.launchAtLogin ? .on : .off
+        updateItem?.title = Self.updateTitle(for: Updater.shared.phase)
         permissionItem?.isHidden = trusted
+    }
+
+    /// One menu row tells the whole update story: its title is the state and
+    /// its action follows — check when idle, install when one is ready.
+    private static func updateTitle(for phase: Updater.Phase) -> String {
+        switch phase {
+        case .idle: return "Check for Updates…"
+        case .checking: return "Checking for Updates…"
+        case .available(let v): return "Install Update v\(v)…"
+        case .downloading(let v): return "Downloading Update v\(v)…"
+        case .installing(let v): return "Installing Update v\(v)…"
+        case .upToDate: return "You're Up to Date ✓"
+        case .failed(let reason): return "Update Failed (\(reason)) — Try Again"
+        }
     }
 
     // MARK: - Actions
@@ -197,6 +222,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func toggleLogin() {
         AppState.shared.setLaunchAtLogin(!AppState.shared.launchAtLogin)
         refreshMenu()
+    }
+
+    @objc private func checkForUpdates() {
+        if case .available = Updater.shared.phase {
+            Updater.shared.installUpdate()
+        } else {
+            Updater.shared.checkForUpdates()
+        }
     }
 
     @objc private func requestPermission() {

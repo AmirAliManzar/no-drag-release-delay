@@ -10,6 +10,10 @@ APP="/Applications/No Drag Release Delay.app"
 CONSOLE_USER="$(stat -f '%Su' /dev/console)"
 
 if [ -d "$APP" ] && [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "root" ]; then
+    # A self-update installs over a running instance: retire the old process
+    # before handing the fresh bundle the user's session.
+    pkill -x NoDragReleaseDelay 2>/dev/null || true
+    sleep 0.3
     launchctl asuser "$(id -u "$CONSOLE_USER")" open "$APP" || true
 fi
 

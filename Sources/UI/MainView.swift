@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainView: View {
     @ObservedObject var state: AppState
+    @ObservedObject var updater: Updater = .shared
     var onAbout: () -> Void = {}
     var onDone: () -> Void
 
@@ -19,7 +20,7 @@ struct MainView: View {
         }
         .padding(.horizontal, 24)
         .padding(.top, 32)
-        .padding(.bottom, 20)
+        .padding(.bottom, 24)
         .frame(width: 540)
         .fixedSize(horizontal: false, vertical: true)
         .background(Color(nsColor: .windowBackgroundColor))
@@ -159,8 +160,55 @@ struct MainView: View {
             toggle("Show in Dock", isOn: state.showInDock, set: state.setShowInDock)
             divider
             toggle("Launch at login", isOn: state.launchAtLogin, set: state.setLaunchAtLogin)
+            divider
+            toggle("Update automatically", isOn: state.autoUpdate, set: state.setAutoUpdate)
+            divider
+            updateRow
         }
         .background(card)
+    }
+
+    /// One row carries the update story: its trailing text is the state and
+    /// its button follows — check when idle, install when one is ready.
+    private var updateRow: some View {
+        HStack {
+            Text("Check for updates").font(.system(size: 12))
+            Spacer(minLength: 12)
+            Text(updateStatusText)
+                .font(.system(size: 10))
+                .foregroundStyle(.secondary)
+            Button(updateButtonTitle) { updateButtonAction() }
+                .controlSize(.small)
+                .disabled(updater.isBusy)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 5)
+    }
+
+    private var updateStatusText: String {
+        switch updater.phase {
+        case .idle: return "v\(updater.currentVersion)"
+        case .checking: return "Checking…"
+        case .available(let v): return "v\(v) available"
+        case .downloading(let v): return "Downloading v\(v)…"
+        case .installing(let v): return "Installing v\(v)…"
+        case .upToDate: return "Up to date"
+        case .failed: return "Failed — try again"
+        }
+    }
+
+    private var updateButtonTitle: String {
+        if case .available = updater.phase { return "Install" }
+        return "Check now"
+    }
+
+    private func updateButtonAction() {
+        if case .available = updater.phase {
+            updater.installUpdate()
+        } else {
+            updater.checkForUpdates()
+        }
     }
 
     private var modeRow: some View {
