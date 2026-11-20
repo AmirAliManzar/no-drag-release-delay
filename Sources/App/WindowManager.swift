@@ -21,6 +21,7 @@ final class WindowManager {
                 self?.mainWindow?.close()
             }
             let controller = NSHostingController(rootView: root)
+            controller.sizingOptions = [.intrinsicContentSize]
             let window = NSWindow(contentViewController: controller)
             window.styleMask = [.titled, .closable, .fullSizeContentView]
             window.title = "No Drag Release Delay"
@@ -34,6 +35,18 @@ final class WindowManager {
 
         NSApp.activate(ignoringOtherApps: true)
         mainWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    /// Brings whichever window is already on screen back to the front. The
+    /// activation-policy flip pushes open windows behind the frontmost app,
+    /// which reads like the app just quit.
+    func refocusVisibleWindow() {
+        let window = mainWindow?.isVisible == true
+            ? mainWindow
+            : (aboutWindow?.isVisible == true ? aboutWindow : nil)
+        guard let window else { return }
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
     }
 
     func showAbout() {
