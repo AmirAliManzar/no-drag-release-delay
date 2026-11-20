@@ -3,6 +3,7 @@ import ApplicationServices
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
+    private var statusMenu: NSMenu?
     private var enabledItem: NSMenuItem?
     private var menuBarItem: NSMenuItem?
     private var dockItem: NSMenuItem?
@@ -20,8 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppState.shared.onPresentationChange = { [weak self] in self?.applyPresentation() }
         Engine.shared.onChange = { AppState.shared.refresh() }
 
-        buildStatusItem()
-        buildMenu()
+        buildStatusMenu()
         applyPresentation()
 
         Engine.shared.start()
@@ -65,17 +65,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// The status item follows `menuBarMode`; `windowOpen` additionally needs
     /// to know whether a window is on screen, which the 0.5 s poll keeps fresh.
+    ///
+    /// The item is created and removed rather than toggled through
+    /// `NSStatusItem.isVisible`: explicit creation is the one behaviour every
+    /// macOS release agrees on, and an item that is only ever created while it
+    /// should be on screen cannot linger hidden in the overflow area.
     private func syncMenuBarVisibility() {
         let mode = Preferences.shared.menuBarMode
-        statusItem?.isVisible = mode == .always
+        let shouldShow = mode == .always
             || (mode == .windowOpen && WindowManager.shared.hasVisibleWindow)
+
+        if shouldShow, statusItem == nil {
+            let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+            item.button?.imagePosition = .imageOnly
+            item.menu = statusMenu
+            statusItem = item
+            updateStatusIcon()
+            Log.shared.info("status item shown (mode \(mode.rawValue))")
+        } else if !shouldShow, let item = statusItem {
+            NSStatusBar.system.removeStatusItem(item)
+            statusItem = nil
+            Log.shared.info("status item hidden (mode \(mode.rawValue))")
+        }
     }
 
-    private func buildStatusItem() {
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.imagePosition = .imageOnly
-        statusItem = item
-        updateStatusIcon()
+    private func buildStatusMenu() {
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+
+        enabledItem = add(to: menu, "Enabled", #selector(toggleEnabled))
+        menu.addItem(.separator())
+        menuBarItem = add(to: menu, "Menu Bar", nil)
+        menuBarItem?.submenu = buildMenuBarModeSubmenu()
+        dockItem = add(to: menu, "Show in Dock", #selector(toggleDock))
+        loginItem = add(to: menu, "Launch at Login", #selector(toggleLogin))
+        menu.addItem(.separator())
+        permissionItem = add(to: menu, "Grant Accessibility Access…", #selector(requestPermission))
+        add(to: menu, "Setup & Test…", #selector(showMain))
+        add(to: menu, "Open Diagnostics Log", #selector(openLog))
+        menu.addItem(.separator())
+        add(to: menu, "About No Drag Release Delay", #selector(showAbout))
+        add(to: menu, "Quit No Drag Release Delay", #selector(quit), key: "q")
+
+        statusMenu = menu
     }
 
     private func updateStatusIcon() {
@@ -96,27 +128,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // MARK: - Menu
-
-    private func buildMenu() {
-        let menu = NSMenu()
-        menu.autoenablesItems = false
-
-        enabledItem = add(to: menu, "Enabled", #selector(toggleEnabled))
-        menu.addItem(.separator())
-        menuBarItem = add(to: menu, "Menu Bar", nil)
-        menuBarItem?.submenu = buildMenuBarModeSubmenu()
-        dockItem = add(to: menu, "Show in Dock", #selector(toggleDock))
-        loginItem = add(to: menu, "Launch at Login", #selector(toggleLogin))
-        menu.addItem(.separator())
-        permissionItem = add(to: menu, "Grant Accessibility Access…", #selector(requestPermission))
-        add(to: menu, "Setup & Test…", #selector(showMain))
-        add(to: menu, "Open Diagnostics Log", #selector(openLog))
-        menu.addItem(.separator())
-        add(to: menu, "About No Drag Release Delay", #selector(showAbout))
-        add(to: menu, "Quit No Drag Release Delay", #selector(quit), key: "q")
-
-        statusItem?.menu = menu
-    }
 
     @discardableResult
     private func add(to menu: NSMenu, _ title: String, _ action: Selector?, key: String = "") -> NSMenuItem {
