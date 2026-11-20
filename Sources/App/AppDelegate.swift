@@ -82,6 +82,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             statusItem = item
             updateStatusIcon()
             Log.shared.info("status item shown (mode \(mode.rawValue))")
+            // Where macOS actually placed the bar cell — the visible strip or
+            // the overflow area — is not queryable through NSStatusItem, but
+            // the button's own window knows.
+            for delay in [0.5, 3.0] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                    guard let frame = self?.statusItem?.button?.window?.frame else { return }
+                    let visible = self?.statusItem?.button?.window?.isVisible ?? false
+                    Log.shared.info("status item frame \(Int(frame.origin.x)),\(Int(frame.origin.y)) \(Int(frame.width))x\(Int(frame.height)) visible=\(visible)")
+                }
+            }
         } else if !shouldShow, let item = statusItem {
             NSStatusBar.system.removeStatusItem(item)
             statusItem = nil
@@ -122,7 +132,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             tooltip = "No Drag Release Delay — active"
         }
 
-        button.image = StatusIcon.mouse()
+        button.image = StatusIcon.appIcon()
         button.appearsDisabled = !trusted || !Preferences.shared.isEnabled
         button.toolTip = tooltip
     }
