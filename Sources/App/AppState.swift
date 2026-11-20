@@ -49,10 +49,12 @@ final class AppState: ObservableObject {
         refresh()
     }
 
-    /// Mirrors the old boolean rule: hiding the menu bar entirely keeps the
-    /// Dock on, so the app stays reachable through one surface.
+    /// The app must stay reachable through at least one surface: a menu bar
+    /// mode other than `.always` hides the icon for part or all of the time,
+    /// so it requires the Dock — and turning the Dock off falls back to
+    /// `.always` instead of leaving the app unreachable.
     func setMenuBarMode(_ value: MenuBarMode) {
-        if value == .never && !showInDock {
+        if value != .always && !showInDock {
             Preferences.shared.showInDock = true
         }
         Preferences.shared.menuBarMode = value
@@ -61,7 +63,7 @@ final class AppState: ObservableObject {
     }
 
     func setShowInDock(_ value: Bool) {
-        if !value && menuBarMode == .never {
+        if !value && menuBarMode != .always {
             Preferences.shared.menuBarMode = .always
         }
         Preferences.shared.showInDock = value
