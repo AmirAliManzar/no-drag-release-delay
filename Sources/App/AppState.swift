@@ -91,7 +91,13 @@ final class AppState: ObservableObject {
     func requestAccessibility() {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
-        AppState.shared.openAccessibilitySettings()
+        // Give the system modal a beat to appear, then slide the exact pane in
+        // behind it — unless the grant already landed.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            if !AXIsProcessTrusted() {
+                self.openAccessibilitySettings()
+            }
+        }
     }
 
     func openAccessibilitySettings() {

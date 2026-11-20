@@ -33,7 +33,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if !trusted {
-            AppState.shared.requestAccessibility()
+            // The permission flow comes up on its own — modal first, the exact
+            // pane right behind it — instead of waiting for a Grant click.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                AppState.shared.requestAccessibility()
+            }
         }
     }
 
@@ -58,9 +62,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         updateStatusIcon()
         refreshMenu()
 
-        if useDock {
-            NSApp.activate(ignoringOtherApps: true)
-        }
+        // The policy flip can push an open window behind the frontmost app;
+        // bring it back, so turning the Dock off never reads as "the app quit".
+        WindowManager.shared.refocusVisibleWindow()
     }
 
     /// The status item follows `menuBarMode`; `windowOpen` additionally needs
