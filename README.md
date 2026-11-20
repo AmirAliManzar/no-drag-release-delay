@@ -1,8 +1,18 @@
+<div align="center">
+  <img src="docs/icon.png" width="128" alt="No Drag Release Delay">
+
 # No Drag Release Delay
 
+**A tap-drag ends the instant the last finger lifts.**
+
+No delayed drop · no stray click · no Xcode required
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/badge/release-v1.1.0-5865F2.svg)](https://github.com/AmirAliManzar/no-drag-release-delay/releases/latest)
 [![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black.svg)](#requirements)
 [![Universal](https://img.shields.io/badge/arch-arm64%20%7C%20x86__64-lightgrey.svg)](#requirements)
+
+</div>
 
 A tiny menu bar utility that ends a **tap-drag** the instant the last finger leaves the
 trackpad, instead of the few hundred milliseconds later that macOS takes.
