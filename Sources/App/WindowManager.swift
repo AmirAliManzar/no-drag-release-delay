@@ -15,7 +15,8 @@ final class WindowManager {
 
     func showMain() {
         if mainWindow == nil {
-            let root = MainView(state: .shared) { [weak self] in
+            let root = MainView(state: .shared,
+                                onAbout: { [weak self] in self?.showAbout() }) { [weak self] in
                 Preferences.shared.completedOnboarding = true
                 self?.mainWindow?.close()
             }
