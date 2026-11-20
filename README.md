@@ -128,13 +128,24 @@ xattr -dr com.apple.quarantine "/Applications/No Drag Release Delay.app"
 The menu bar shows the app icon's cursor mark. If it looks dimmed, step 1 is incomplete —
 it reaches full strength once the engine is running.
 
+## Updates
+
+The app checks GitHub releases shortly after launch and every six hours, downloads the
+package for its architecture and applies it through `installer` — you type your password
+once, the app relaunches, done. The Accessibility grant survives because the signing
+identity doesn't change between releases. Control it all from *Setup → Options → Update
+automatically* and *Check now*, or from the status menu's *Check for Updates…* row. The
+self-updater only runs for apps installed in /Applications; anywhere else a check simply
+opens the [releases page][releases].
+
 ## Menu
 
 | Item | |
 | --- | --- |
 | Enabled | Pause the engine without quitting. |
-| Menu Bar | Always, while a window is open, or never. Any mode other than *Always* keeps the Dock icon on, so the app is never unreachable. |
+| Menu Bar | Always, while a window is open, or never — independent of the Dock; hide both and the engine keeps working in the background. |
 | Show in Dock | Switches the activation policy between accessory and regular. |
+| Check for Updates… | Runs the self-updater; its title tracks the whole update state. |
 | Launch at Login | Registered through `SMAppService`. |
 | Setup & Test… | The first-run window. |
 | Open Diagnostics Log | `~/Library/Logs/NoDragReleaseDelay.log`. |

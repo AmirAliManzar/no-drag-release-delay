@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] — 2026-11-21
+
+### Added
+
+- **Self-updater.** The app checks GitHub releases shortly after launch and every six
+  hours; when a newer tag appears it downloads the matching package and applies it
+  through `installer` with administrator privileges, then relaunches. The Accessibility
+  grant survives the swap because the signing identity never changes. Toggle it with
+  *Update automatically* in Options; the status menu's *Check for Updates…* row and the
+  Setup window's *Check now* row drive the same flow. Self-updating runs only from
+  /Applications — anywhere else the check hands off to the releases page.
+
+### Changed
+
+- Menu bar and Dock presence are fully independent: hiding both leaves the engine
+  working quietly in the background — the forced reachability fallback is gone.
+- Roomier bottom edge on the setup window.
+
 ## [1.2.1] — 2026-11-21
 
 ### Changed
@@ -86,6 +104,7 @@ All notable changes to this project are documented here. The format follows
 - Requires macOS 13 or later and Accessibility permission.
 - Inactive while drag lock is enabled, by design.
 
+[1.3.0]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.3.0
 [1.2.1]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.2.1
 [1.2.0]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.2.0
 [1.1.1]: https://github.com/AmirAliManzar/no-drag-release-delay/releases/tag/v1.1.1
