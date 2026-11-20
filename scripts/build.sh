@@ -87,9 +87,17 @@ done
 xattr -cr "$APP"
 
 echo "==> Signing"
-if [ -n "${CODESIGN_IDENTITY:-}" ]; then
-    codesign --force --options runtime --timestamp \
-        --sign "$CODESIGN_IDENTITY" --identifier "$BUNDLE_ID" "$APP"
+# A stable signing identity keeps the Accessibility grant alive across
+# rebuilds: TCC keys the grant on the designated requirement, and an ad-hoc
+# signature gets a fresh hash — and a dead grant — every single build. When a
+# Developer ID is not configured, prefer the local self-signed certificate.
+SIGN_IDENTITY="${CODESIGN_IDENTITY:-}"
+if [ -z "$SIGN_IDENTITY" ] && security find-identity -v -p codesigning 2>/dev/null | grep -q "NDRD Local"; then
+    SIGN_IDENTITY="NDRD Local"
+fi
+
+if [ -n "$SIGN_IDENTITY" ]; then
+    codesign --force --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" "$APP"
 else
     codesign --force --sign - --identifier "$BUNDLE_ID" --timestamp=none "$APP"
 fi
