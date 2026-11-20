@@ -80,7 +80,12 @@ Download the artifact for your Mac from the [releases page][releases]:
 | --- | --- |
 | `NoDragReleaseDelay-<version>-arm64.pkg` | Apple Silicon (M1 and later) |
 | `NoDragReleaseDelay-<version>-x86_64.pkg` | Intel |
-| `NoDragReleaseDelay-<version>-universal.dmg` | Either — drag to *Applications* |
+| `NoDragReleaseDelay-<version>-arm64.dmg` | Apple Silicon, drag to *Applications* |
+| `NoDragReleaseDelay-<version>-x86_64.dmg` | Intel, drag to *Applications* |
+
+The artifacts are per-architecture on purpose: a universal binary carries an Intel slice
+that macOS flags with an *App Update Required* warning on Apple Silicon, and the two
+builds are otherwise identical.
 
 The installers copy the app to `/Applications` and launch it, so the first-run window can
 walk you through the accessibility grant. `SHA256SUMS` is published alongside them.
@@ -173,6 +178,8 @@ Sources/
   UI/
     MainView.swift      setup, options, drag test
     AboutView.swift     about panel
+Resources/
+  BrandIcons/           the vector marks used by the About panel
 ```
 
 Notes on a few decisions:
