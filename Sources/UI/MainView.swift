@@ -149,7 +149,7 @@ struct MainView: View {
     // MARK: - Options
 
     private var options: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             toggle("Enabled", isOn: state.isEnabled, set: state.setEnabled)
             divider
             modeRow
@@ -176,6 +176,7 @@ struct MainView: View {
             .labelsHidden()
             .frame(width: 210)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 5)
     }
@@ -218,6 +219,9 @@ struct MainView: View {
         }
         .toggleStyle(.switch)
         .controlSize(.mini)
+        // A Toggle sizes to its label, so without a full-width frame the row
+        // would sit centred inside the card.
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 5)
     }
