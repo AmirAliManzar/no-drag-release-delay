@@ -82,6 +82,8 @@ Download the artifact for your Mac from the [releases page][releases]:
 | `NoDragReleaseDelay-<version>-x86_64.pkg` | Intel |
 | `NoDragReleaseDelay-<version>-arm64.dmg` | Apple Silicon, drag to *Applications* |
 | `NoDragReleaseDelay-<version>-x86_64.dmg` | Intel, drag to *Applications* |
+| `NoDragReleaseDelay-<version>-arm64.app.zip` | Apple Silicon, unzipped app |
+| `NoDragReleaseDelay-<version>-x86_64.app.zip` | Intel, unzipped app |
 
 The artifacts are per-architecture on purpose: a universal binary carries an Intel slice
 that macOS flags with an *App Update Required* warning on Apple Silicon, and the two
@@ -98,25 +100,26 @@ downloaded from the internet; open *System Settings → Privacy & Security* and 
 xattr -dr com.apple.quarantine "/Applications/No Drag Release Delay.app"
 ```
 
-[releases]: https://github.com/amiralimanzar/no-drag-release-delay/releases
+[releases]: https://github.com/AmirAliManzar/no-drag-release-delay/releases
 
 ## First run
 
 1. **Accessibility access** — click *Grant*, then enable *No Drag Release Delay* in the
-   list. The app polls for the grant and starts the event tap on its own.
+   list and confirm the system dialog if one appears. The app polls for the grant and
+   starts the event tap on its own.
 2. **Tap to drag** — turn it on if the row is not green.
 3. **Try it** — double-tap the card in the window and drag it. It should stop the moment
    you lift your finger.
 
-If the menu bar icon is a warning triangle, step 1 is incomplete. The icon is a cursor
-with motion lines once the engine is running.
+The menu bar shows the app icon's cursor mark. If it looks dimmed, step 1 is incomplete —
+it reaches full strength once the engine is running.
 
 ## Menu
 
 | Item | |
 | --- | --- |
 | Enabled | Pause the engine without quitting. |
-| Show in Menu Bar | Independent of the Dock icon. Turning the last visible surface off turns the other one on, so the app is never unreachable. |
+| Menu Bar | Always, while a window is open, or never. Any mode other than *Always* keeps the Dock icon on, so the app is never unreachable. |
 | Show in Dock | Switches the activation policy between accessory and regular. |
 | Launch at Login | Registered through `SMAppService`. |
 | Setup & Test… | The first-run window. |
@@ -127,7 +130,7 @@ with motion lines once the engine is running.
 Requires the Xcode Command Line Tools (no Xcode project, no third-party dependencies):
 
 ```sh
-git clone https://github.com/amiralimanzar/no-drag-release-delay.git
+git clone https://github.com/AmirAliManzar/no-drag-release-delay.git
 cd no-drag-release-delay
 ./scripts/build.sh                 # universal
 ./scripts/build.sh arm64           # Apple Silicon only
@@ -137,7 +140,7 @@ cd no-drag-release-delay
 Output lands in `build/<arch>/No Drag Release Delay.app`. Add `--install` to copy it to
 `/Applications`.
 
-Release artifacts — both `.pkg` installers, the universal `.dmg`, and checksums:
+Release artifacts — per-architecture `.pkg` installers and `.dmg` images, plus checksums:
 
 ```sh
 ./scripts/package.sh
@@ -164,6 +167,7 @@ Sources/
   App/
     main.swift          NSApplication bootstrap
     AppDelegate.swift   status item, menu, permission polling
+    StatusIcon.swift    the menu bar mark
     AppState.swift      single observable source of truth for the UI
     WindowManager.swift window ownership and reuse
     Installer.swift     "move to /Applications" for DMG launches
@@ -204,7 +208,7 @@ tail -f ~/Library/Logs/NoDragReleaseDelay.log
 
 | Symptom | Cause |
 | --- | --- |
-| Warning triangle in the menu bar | Accessibility not granted, or the grant was invalidated by a rebuild. |
+| The menu bar mark is dimmed | Accessibility not granted, or the grant was invalidated by a rebuild. |
 | `not a drag, left alone` | The button was already up 35 ms after the lift — a click, not a drag. |
 | `drag lock is on, leaving the button pressed` | Turn drag lock off. |
 | Nothing logged at all | `multitouch: framework unavailable` — the private framework is missing on this OS. |
