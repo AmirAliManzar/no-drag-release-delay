@@ -73,25 +73,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateStatusIcon() {
         guard let button = statusItem?.button else { return }
 
-        let name: String
         let tooltip: String
-
-        if !trusted {
-            name = "exclamationmark.triangle.fill"
-            tooltip = "No Drag Release Delay — accessibility access required"
-        } else if !Preferences.shared.isEnabled {
-            name = "cursorarrow.slash"
+        if !Preferences.shared.isEnabled {
             tooltip = "No Drag Release Delay — paused"
+        } else if !trusted {
+            tooltip = "No Drag Release Delay — open Setup to grant access"
         } else {
-            name = "cursorarrow.motionlines"
             tooltip = "No Drag Release Delay — active"
         }
 
-        if let image = NSImage(systemSymbolName: name, accessibilityDescription: tooltip) {
-            image.isTemplate = true
-            button.image = image
-        }
-        button.appearsDisabled = trusted && !Preferences.shared.isEnabled
+        button.image = StatusIcon.mouse()
+        button.appearsDisabled = !trusted || !Preferences.shared.isEnabled
         button.toolTip = tooltip
     }
 
