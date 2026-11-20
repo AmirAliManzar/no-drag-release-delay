@@ -13,8 +13,8 @@ enum MenuBarMode: String {
 /// User-facing settings, backed by `UserDefaults`.
 ///
 /// Presentation is split across two surfaces: a three-way `menuBarMode` and a
-/// `showInDock` boolean. The two are independent, and the only invariant is
-/// that the app must remain reachable through at least one of them.
+/// `showInDock` boolean. The two are fully independent — hiding both leaves
+/// the engine working quietly in the background, by design.
 final class Preferences {
     static let shared = Preferences()
     static let didChange = Notification.Name("Preferences.didChange")
@@ -23,6 +23,7 @@ final class Preferences {
         static let enabled = "enabled"
         static let menuBarMode = "menuBarMode"
         static let showInDock = "showInDock"
+        static let autoUpdate = "autoUpdate"
         static let completedOnboarding = "completedOnboarding"
     }
 
@@ -33,6 +34,7 @@ final class Preferences {
             Key.enabled: true,
             Key.menuBarMode: MenuBarMode.always.rawValue,
             Key.showInDock: true,
+            Key.autoUpdate: true,
             Key.completedOnboarding: false,
         ])
     }
@@ -50,6 +52,11 @@ final class Preferences {
     var showInDock: Bool {
         get { store.bool(forKey: Key.showInDock) }
         set { store.set(newValue, forKey: Key.showInDock); notifyChange() }
+    }
+
+    var autoUpdate: Bool {
+        get { store.bool(forKey: Key.autoUpdate) }
+        set { store.set(newValue, forKey: Key.autoUpdate); notifyChange() }
     }
 
     var completedOnboarding: Bool {

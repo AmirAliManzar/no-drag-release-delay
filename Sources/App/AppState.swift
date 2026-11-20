@@ -11,6 +11,7 @@ final class AppState: ObservableObject {
     @Published private(set) var isEnabled = Preferences.shared.isEnabled
     @Published private(set) var menuBarMode = Preferences.shared.menuBarMode
     @Published private(set) var showInDock = Preferences.shared.showInDock
+    @Published private(set) var autoUpdate = Preferences.shared.autoUpdate
     @Published private(set) var tapToDrag = TrackpadSettings.draggingEnabled
     @Published private(set) var dragLock = TrackpadSettings.dragLockEnabled
     @Published private(set) var threeFingerDrag = TrackpadSettings.threeFingerDragEnabled
@@ -29,6 +30,7 @@ final class AppState: ObservableObject {
         assign(\.isEnabled, Preferences.shared.isEnabled)
         assign(\.menuBarMode, Preferences.shared.menuBarMode)
         assign(\.showInDock, Preferences.shared.showInDock)
+        assign(\.autoUpdate, Preferences.shared.autoUpdate)
         assign(\.tapToDrag, TrackpadSettings.draggingEnabled)
         assign(\.dragLock, TrackpadSettings.dragLockEnabled)
         assign(\.threeFingerDrag, TrackpadSettings.threeFingerDragEnabled)
@@ -49,26 +51,23 @@ final class AppState: ObservableObject {
         refresh()
     }
 
-    /// The app must stay reachable through at least one surface: a menu bar
-    /// mode other than `.always` hides the icon for part or all of the time,
-    /// so it requires the Dock — and turning the Dock off falls back to
-    /// `.always` instead of leaving the app unreachable.
+    /// The two presentation surfaces are independent by design: hiding both
+    /// menu bar and Dock leaves the engine working quietly in the background.
     func setMenuBarMode(_ value: MenuBarMode) {
-        if value != .always && !showInDock {
-            Preferences.shared.showInDock = true
-        }
         Preferences.shared.menuBarMode = value
         refresh()
         onPresentationChange?()
     }
 
     func setShowInDock(_ value: Bool) {
-        if !value && menuBarMode != .always {
-            Preferences.shared.menuBarMode = .always
-        }
         Preferences.shared.showInDock = value
         refresh()
         onPresentationChange?()
+    }
+
+    func setAutoUpdate(_ value: Bool) {
+        Preferences.shared.autoUpdate = value
+        refresh()
     }
 
     func setLaunchAtLogin(_ value: Bool) {
