@@ -132,7 +132,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             tooltip = "No Drag Release Delay — active"
         }
 
-        button.image = StatusIcon.appIcon()
+        button.image = StatusIcon.mark()
         button.appearsDisabled = !trusted || !Preferences.shared.isEnabled
         button.toolTip = tooltip
     }
